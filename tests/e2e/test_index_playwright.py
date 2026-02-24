@@ -48,10 +48,15 @@ def http_server():
 
 
 @pytest.fixture(scope="session")
-def browser_context(http_server):
-    """Launch a single browser process for the session."""
+def browser_context(http_server, browser_extra_args):
+    """Launch a single browser process for the session.
+
+    ``browser_extra_args`` (from conftest) supplies the additional flags
+    required to prevent the renderer from crashing inside Docker / CI
+    containers (no-sandbox, disable-dev-shm-usage, etc.).
+    """
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(headless=True, args=browser_extra_args)
         context = browser.new_context(viewport={"width": 1280, "height": 800})
         yield context, http_server
         browser.close()
