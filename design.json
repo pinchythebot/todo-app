@@ -1,0 +1,175 @@
+{
+  "implementation_plan": [
+    {
+      "step": 1,
+      "description": "Create the root index.html file with a proper HTML5 boilerplate: DOCTYPE declaration, <html lang='en'>, <head> with meta charset, viewport meta tag, a descriptive <title>, and the opening <body> tag. Set a data-theme attribute on <html> defaulting to 'light' so CSS custom-property theming works without JavaScript at first paint.",
+      "files": ["index.html"]
+    },
+    {
+      "step": 2,
+      "description": "Embed a full CSS reset inside a <style> block in <head>. Use a modern minimal reset (box-sizing: border-box on *, margin/padding zeroing, font-size normalisation, line-height inherit) rather than the heavy normalize.css so the file stays lean. Reset lists (ul/ol), buttons, inputs, and anchors individually to wipe browser defaults that would conflict with the custom design.",
+      "files": ["index.html"]
+    },
+    {
+      "step": 3,
+      "description": "Define CSS custom properties (variables) on the :root selector for the light theme and override them under [data-theme='dark']. Variables must cover: --color-bg, --color-surface, --color-surface-alt, --color-border, --color-text-primary, --color-text-secondary, --color-accent, --color-accent-hover, --color-danger, --color-shadow, --color-toggle-bg, --color-toggle-icon. Also define non-colour tokens: --spacing-xs through --spacing-xl, --radius-sm, --radius-md, --radius-lg, --radius-full, --font-family, --font-size-base, --font-size-sm, --font-size-lg, --font-size-xl, --font-size-xxl, --transition-speed.",
+      "files": ["index.html"]
+    },
+    {
+      "step": 4,
+      "description": "Write global / body styles: apply var(--font-family) using a system font stack ('Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif) so zero external requests are needed. Set background-color to var(--color-bg), color to var(--color-text-primary), min-height: 100vh, and a smooth CSS transition on background-color and color so theme switching is animated. Centre the page content with a max-width container using flexbox column layout.",
+      "files": ["index.html"]
+    },
+    {
+      "step": 5,
+      "description": "Build the <header> element. It contains: an <h1> with the app title 'My Todos', and a <button id='theme-toggle'> that displays a sun/moon icon via inline SVG (no img src = no external request). The header uses flexbox with space-between alignment. Style the h1 with var(--font-size-xxl), font-weight 700, and the accent colour. Style the toggle button as a circular icon button with a smooth icon swap handled by CSS (show .icon-sun vs .icon-moon based on [data-theme] attribute selector).",
+      "files": ["index.html"]
+    },
+    {
+      "step": 6,
+      "description": "Build the todo-input section inside <main>. Use a <section class='input-area'> containing a <form id='todo-form'>: a text <input id='todo-input' type='text' placeholder='What needs to be done?'> and a <button type='submit' id='add-btn'>Add</button>. Style the form as a flex row. The input takes flex: 1 with var(--radius-md) border-radius, var(--color-border) border, padding from spacing tokens, and focus ring using the accent colour. The add button gets the accent background, white text, border-radius, and a hover state.",
+      "files": ["index.html"]
+    },
+    {
+      "step": 7,
+      "description": "Build the todo list container. Place a <section class='todo-section'> after the input area containing an empty <ul id='todo-list'> with a placeholder <li class='empty-state'> (text: 'No todos yet — add one above!'). Style the <ul> with no list-style, the surface background var(--color-surface), box-shadow using var(--color-shadow), and border-radius var(--radius-lg). Each future <li> will inherit card-like styles. The empty-state li should be centred, italic, and styled with var(--color-text-secondary).",
+      "files": ["index.html"]
+    },
+    {
+      "step": 8,
+      "description": "Build the <footer> element. It contains: a <span id='items-left'>0 items left</span> counter, a <nav class='filters' aria-label='Filter todos'> with three <button>s (data-filter='all', data-filter='active', data-filter='completed') labelled 'All', 'Active', 'Completed', and a <button id='clear-completed'>Clear completed</button>. Style the footer as a responsive flexbox row. Filter buttons get a subtle active state (border + accent colour). The clear-completed button gets the danger colour. Use aria-pressed on the filter buttons for accessibility.",
+      "files": ["index.html"]
+    },
+    {
+      "step": 9,
+      "description": "Add a minimal <script> block at the bottom of <body> (before </body>) for theme toggle only. The script reads localStorage for saved theme preference, applies it on load (preventing flash of wrong theme by setting the attribute before DOMContentLoaded completes — achieved by placing a tiny inline script in <head>), and wires up the toggle button click handler to flip data-theme between 'light' and 'dark' and persist to localStorage. No other JS is included in this step — todo logic is a future task.",
+      "files": ["index.html"]
+    },
+    {
+      "step": 10,
+      "description": "Add polishing CSS: smooth hover/focus transitions on all interactive elements (buttons, inputs), a subtle app-level background pattern or gradient on the page background, responsive breakpoints (mobile-first, single breakpoint at 600px), print styles that hide the header theme toggle and footer controls, and a :focus-visible ring that uses the accent colour to support keyboard navigation without showing rings on mouse clicks.",
+      "files": ["index.html"]
+    },
+    {
+      "step": 11,
+      "description": "Validate, review, and commit. Run the file through the W3C HTML validator mentally (confirm no deprecated tags, all ARIA roles present, all form elements have accessible labels/placeholders). Verify the file has zero external HTTP references by grepping for 'http' outside of comments. Commit with a descriptive message.",
+      "files": ["index.html"]
+    }
+  ],
+
+  "file_changes": [],
+
+  "new_files": [
+    {
+      "path": "index.html",
+      "purpose": "The single, self-contained application shell for the Todo App. Provides the complete semantic HTML5 document structure, all embedded CSS (reset, custom properties, theming, layout, component styles, responsive breakpoints), and a minimal inline script for light/dark theme persistence. Acts as the foundation that all subsequent feature branches will build upon — adding interactive JavaScript for CRUD operations, drag-and-drop, persistence, etc.",
+      "detailed_structure": {
+        "head": [
+          "<!DOCTYPE html> + <html lang='en' data-theme='light'>",
+          "<meta charset='UTF-8'>",
+          "<meta name='viewport' content='width=device-width, initial-scale=1.0'>",
+          "<title>My Todos</title>",
+          "Inline <script> — reads localStorage theme preference and sets data-theme BEFORE render to avoid FOUC",
+          "<style> block containing all CSS"
+        ],
+        "css_sections": [
+          "/* ===== CSS Reset ===== */",
+          "/* ===== Custom Properties — Light Theme ===== */",
+          "/* ===== Custom Properties — Dark Theme ===== */",
+          "/* ===== Base / Global Styles ===== */",
+          "/* ===== Layout Container ===== */",
+          "/* ===== Header ===== */",
+          "/* ===== Theme Toggle Button ===== */",
+          "/* ===== Input Area ===== */",
+          "/* ===== Todo List ===== */",
+          "/* ===== Empty State ===== */",
+          "/* ===== Footer ===== */",
+          "/* ===== Filter Buttons ===== */",
+          "/* ===== Clear Completed Button ===== */",
+          "/* ===== Responsive (max-width: 600px) ===== */",
+          "/* ===== Focus Visible Styles ===== */",
+          "/* ===== Transitions / Animation ===== */"
+        ],
+        "body": [
+          "<header> — h1 title + theme toggle button (inline SVG icon)",
+          "<main>",
+          "  <section class='input-area'> — <form> with <input> + <button>",
+          "  <section class='todo-section'> — <ul id='todo-list'> (empty, with empty-state li)",
+          "</main>",
+          "<footer>",
+          "  <span id='items-left'>",
+          "  <nav class='filters' aria-label='Filter todos'>",
+          "    <button data-filter='all' aria-pressed='true'>All</button>",
+          "    <button data-filter='active' aria-pressed='false'>Active</button>",
+          "    <button data-filter='completed' aria-pressed='false'>Completed</button>",
+          "  </nav>",
+          "  <button id='clear-completed'>Clear completed</button>",
+          "</footer>",
+          "<script> — theme toggle wiring only"
+        ]
+      },
+      "css_custom_properties": {
+        "light_theme": {
+          "--color-bg": "#f0f2f5",
+          "--color-surface": "#ffffff",
+          "--color-surface-alt": "#f8f9fa",
+          "--color-border": "#e1e4e8",
+          "--color-text-primary": "#1a1d23",
+          "--color-text-secondary": "#6b7280",
+          "--color-accent": "#6366f1",
+          "--color-accent-hover": "#4f52d0",
+          "--color-danger": "#ef4444",
+          "--color-shadow": "rgba(0,0,0,0.08)",
+          "--color-toggle-bg": "#e5e7eb",
+          "--radius-sm": "4px",
+          "--radius-md": "8px",
+          "--radius-lg": "12px",
+          "--radius-full": "9999px",
+          "--spacing-xs": "4px",
+          "--spacing-sm": "8px",
+          "--spacing-md": "16px",
+          "--spacing-lg": "24px",
+          "--spacing-xl": "40px",
+          "--font-family": "'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          "--transition-speed": "0.2s"
+        },
+        "dark_theme_overrides": {
+          "--color-bg": "#0f1117",
+          "--color-surface": "#1e2130",
+          "--color-surface-alt": "#252a3a",
+          "--color-border": "#2e3348",
+          "--color-text-primary": "#e8eaf0",
+          "--color-text-secondary": "#8b92a9",
+          "--color-accent": "#818cf8",
+          "--color-accent-hover": "#a5b4fc",
+          "--color-danger": "#f87171",
+          "--color-shadow": "rgba(0,0,0,0.4)",
+          "--color-toggle-bg": "#374151"
+        }
+      }
+    }
+  ],
+
+  "test_plan": [
+    "VISUAL: Open index.html in Chrome and Firefox — verify the page renders without any console errors, network requests, or missing resources",
+    "VISUAL: Confirm page layout: header at top with title and toggle button, input form below, empty todo list container, footer with 3 filter buttons and clear button",
+    "THEME-TOGGLE: Click the theme toggle button — verify the entire page smoothly transitions from light theme to dark theme (background, text, input, footer all change)",
+    "THEME-TOGGLE: Reload the page after toggling to dark — verify dark theme persists (localStorage key 'theme' = 'dark' was saved and re-applied on load without flash of light theme)",
+    "THEME-TOGGLE: Toggle back to light — verify all CSS custom property colours revert correctly with no leftover dark-mode artefacts",
+    "NO-EXTERNAL-DEPS: Open DevTools Network tab, hard-reload the page — verify zero external HTTP requests (no fonts, no scripts, no stylesheets, no images loaded from network)",
+    "ACCESSIBILITY: Tab through all interactive elements — verify visible :focus-visible ring appears on the input, add button, filter buttons, clear button, and theme toggle; confirm logical tab order",
+    "ACCESSIBILITY: Use a screen reader (or axe DevTools) — verify h1 has correct heading level, filter nav has aria-label, filter buttons have aria-pressed, form input has accessible label/placeholder",
+    "HTML-VALIDITY: Paste index.html into https://validator.w3.org/#validate_by_input — verify zero errors and zero warnings",
+    "CSS-VALIDITY: Paste the <style> block into the W3C CSS validator — verify zero errors",
+    "RESPONSIVE: Resize viewport to 375px width (mobile) — verify no horizontal scrollbar, input area stacks or shrinks correctly, footer wraps gracefully",
+    "RESPONSIVE: Resize to 768px and 1200px — verify centred container with appropriate max-width is respected",
+    "SEMANTIC-STRUCTURE: In DevTools Elements panel, confirm: one <header>, one <main>, one <footer>, <ul id='todo-list'> exists, <form id='todo-form'> exists, all interactive elements are actual <button> elements (not divs)",
+    "CSS-RESET: Inspect browser default styles are overridden — no bullet points on <ul>, no default margins on <h1>, no default button appearance on filter buttons",
+    "CUSTOM-PROPERTIES: In DevTools, inspect :root computed styles — confirm all --color-* and --spacing-* variables are listed with correct values",
+    "EMPTY-STATE: Verify the empty-state <li> is visible and styled with secondary colour and italic text when the list is empty"
+  ],
+
+  "rollback_plan": "Because this feature introduces only a single new file (index.html) on the isolated feature branch 'feature/base-html-css-foundation', rollback is straightforward and non-destructive to any other work:\n\n1. SOFT ROLLBACK (revert file to previous state):\n   git checkout HEAD~1 -- index.html\n   (If the file did not exist before, this will remove it)\n\n2. FULL BRANCH ROLLBACK (discard all commits on the branch):\n   git reset --hard origin/main\n   (Resets the feature branch pointer back to main, removing all feature commits)\n\n3. BRANCH DELETION (if the branch should be abandoned):\n   git checkout main\n   git branch -D feature/base-html-css-foundation\n   git push origin --delete feature/base-html-css-foundation\n\n4. PR/MERGE ROLLBACK (if already merged to main):\n   git revert <merge-commit-hash> -m 1\n   git push origin main\n   (Creates a new revert commit rather than rewriting history — safe for shared branches)\n\nNo database migrations, dependency changes, or configuration file alterations are made by this feature, so rollback has zero risk of breaking other systems.",
+
+  "branch_name": "feature/base-html-css-foundation"
+}
