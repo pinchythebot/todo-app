@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Todos</title>
+
+  <!--
+    Anti-FOUC (Flash of Unstyled Content) inline script.
+    Reads the saved theme from localStorage and applies it to <html>
+    before the browser paints, so the correct theme is shown immediately.
+  -->
+  <script>
+    (function () {
+      var saved = localStorage.getItem('theme');
+      if (saved === 'dark' || saved === 'light') {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    })();
+  </script>
+
+  <style>
+    /* ===== CSS Reset ===== */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 100%;
+      line-height: 1.5;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    ul,
+    ol {
+      list-style: none;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-size: inherit;
+      font-weight: inherit;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      color: inherit;
+      background: none;
+      border: none;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    img,
+    svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    /* ===== Custom Properties — Light Theme ===== */
+    :root {
+      /* Colours */
+      --color-bg:             #f0f2f5;
+      --color-surface:        #ffffff;
+      --color-surface-alt:    #f8f9fa;
+      --color-border:         #e1e4e8;
+      --color-text-primary:   #1a1d23;
+      --color-text-secondary: #6b7280;
+      --color-accent:         #6366f1;
+      --color-accent-hover:   #4f52d0;
+      --color-danger:         #ef4444;
+      --color-shadow:         rgba(0, 0, 0, 0.08);
+      --color-toggle-bg:      #e5e7eb;
+      --color-toggle-icon:    #374151;
+
+      /* Border radius */
+      --radius-sm:   4px;
+      --radius-md:   8px;
+      --radius-lg:   12px;
+      --radius-full: 9999px;
+
+      /* Spacing */
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 40px;
+
+      /* Typography */
+      --font-family:     'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      --font-size-base:  1rem;       /* 16px */
+      --font-size-sm:    0.875rem;   /* 14px */
+      --font-size-lg:    1.125rem;   /* 18px */
+      --font-size-xl:    1.375rem;   /* 22px */
+      --font-size-xxl:   1.75rem;    /* 28px */
+
+      /* Animation */
+      --transition-speed: 0.2s;
+    }
+
+    /* ===== Custom Properties — Dark Theme ===== */
+    [data-theme="dark"] {
+      --color-bg:             #0f1117;
+      --color-surface:        #1e2130;
+      --color-surface-alt:    #252a3a;
+      --color-border:         #2e3348;
+      --color-text-primary:   #e8eaf0;
+      --color-text-secondary: #8b92a9;
+      --color-accent:         #818cf8;
+      --color-accent-hover:   #a5b4fc;
+      --color-danger:         #f87171;
+      --color-shadow:         rgba(0, 0, 0, 0.4);
+      --color-toggle-bg:      #374151;
+      --color-toggle-icon:    #d1d5db;
+    }
+
+    /* ===== Base / Global Styles ===== */
+    body {
+      font-family: var(--font-family);
+      font-size:   var(--font-size-base);
+      color:       var(--color-text-primary);
+      background-color: var(--color-bg);
+
+      /* Subtle radial gradient for page depth */
+      background-image: radial-gradient(
+        ellipse 80% 60% at 50% 0%,
+        rgba(99, 102, 241, 0.06),
+        transparent 70%
+      );
+      background-attachment: fixed;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      /* Smooth theme transitions */
+      transition:
+        background-color var(--transition-speed) ease,
+        color            var(--transition-speed) ease;
+    }
+
+    /* ===== Layout Container ===== */
+    .container {
+      width: 100%;
+      max-width: 600px;
+      padding: var(--spacing-lg) var(--spacing-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+      flex: 1;
+    }
+
+    /* ===== Header ===== */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-md) 0;
+    }
+
+    header h1 {
+      font-size:   var(--font-size-xxl);
+      font-weight: 700;
+      color:       var(--color-accent);
+      letter-spacing: -0.5px;
+    }
+
+    /* ===== Theme Toggle Button ===== */
+    #theme-toggle {
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      width:  40px;
+      height: 40px;
+      border-radius:    var(--radius-full);
+      background-color: var(--color-toggle-bg);
+      color:            var(--color-toggle-icon);
+      transition:
+        background-color var(--transition-speed) ease,
+        color            var(--transition-speed) ease,
+        transform        var(--transition-speed) ease;
+    }
+
+    #theme-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    #theme-toggle:active {
+      transform: scale(0.95);
+    }
+
+    /* Show sun icon in dark mode, moon icon in light mode */
+    #theme-toggle .icon-sun  { display: none; }
+    #theme-toggle .icon-moon { display: block; }
+
+    [data-theme="dark"] #theme-toggle .icon-sun  { display: block; }
+    [data-theme="dark"] #theme-toggle .icon-moon { display: none; }
+
+    /* ===== Input Area ===== */
+    .input-area {
+      background-color: var(--color-surface);
+      border-radius:    var(--radius-lg);
+      box-shadow:       0 2px 12px var(--color-shadow);
+      padding:          var(--spacing-md);
+      transition:
+        background-color var(--transition-speed) ease,
+        box-shadow       var(--transition-speed) ease;
+    }
+
+    #todo-form {
+      display: flex;
+      gap: var(--spacing-sm);
+    }
+
+    #todo-input {
+      flex: 1;
+      padding:          var(--spacing-sm) var(--spacing-md);
+      border:           1.5px solid var(--color-border);
+      border-radius:    var(--radius-md);
+      background-color: var(--color-surface-alt);
+      color:            var(--color-text-primary);
+      font-size:        var(--font-size-base);
+      transition:
+        border-color     var(--transition-speed) ease,
+        background-color var(--transition-speed) ease,
+        box-shadow       var(--transition-speed) ease;
+    }
+
+    #todo-input::placeholder {
+      color: var(--color-text-secondary);
+    }
+
+    #todo-input:focus {
+      border-color: var(--color-accent);
+      box-shadow:   0 0 0 3px rgba(99, 102, 241, 0.15);
+      background-color: var(--color-surface);
+    }
+
+    [data-theme="dark"] #todo-input:focus {
+      box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
+    }
+
+    #add-btn {
+      padding:          var(--spacing-sm) var(--spacing-lg);
+      background-color: var(--color-accent);
+      color:            #ffffff;
+      border-radius:    var(--radius-md);
+      font-size:        var(--font-size-base);
+      font-weight:      600;
+      white-space:      nowrap;
+      transition:
+        background-color var(--transition-speed) ease,
+        transform        var(--transition-speed) ease;
+    }
+
+    #add-btn:hover {
+      background-color: var(--color-accent-hover);
+    }
+
+    #add-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* ===== Todo Section ===== */
+    .todo-section {
+      background-color: var(--color-surface);
+      border-radius:    var(--radius-lg);
+      box-shadow:       0 2px 12px var(--color-shadow);
+      overflow:         hidden;
+      transition:
+        background-color var(--transition-speed) ease,
+        box-shadow       var(--transition-speed) ease;
+    }
+
+    /* ===== Todo List ===== */
+    #todo-list {
+      /* Styles for individual todo items will be added by later feature branches */
+    }
+
+    /* ===== Empty State ===== */
+    .empty-state {
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      padding:         var(--spacing-xl) var(--spacing-md);
+      color:           var(--color-text-secondary);
+      font-size:       var(--font-size-sm);
+      font-style:      italic;
+      text-align:      center;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      display:     flex;
+      align-items: center;
+      flex-wrap:   wrap;
+      gap:         var(--spacing-sm);
+      padding:     var(--spacing-sm) var(--spacing-md);
+      background-color: var(--color-surface);
+      border-radius:    var(--radius-lg);
+      box-shadow:       0 2px 12px var(--color-shadow);
+      font-size:        var(--font-size-sm);
+      color:            var(--color-text-secondary);
+      transition:
+        background-color var(--transition-speed) ease,
+        box-shadow       var(--transition-speed) ease;
+    }
+
+    #items-left {
+      flex: 1;
+      min-width: max-content;
+    }
+
+    /* ===== Filter Buttons ===== */
+    .filters {
+      display: flex;
+      gap:     var(--spacing-xs);
+    }
+
+    .filters button {
+      padding:       var(--spacing-xs) var(--spacing-sm);
+      border:        1.5px solid transparent;
+      border-radius: var(--radius-sm);
+      font-size:     var(--font-size-sm);
+      color:         var(--color-text-secondary);
+      transition:
+        border-color     var(--transition-speed) ease,
+        color            var(--transition-speed) ease,
+        background-color var(--transition-speed) ease;
+    }
+
+    .filters button:hover {
+      color:        var(--color-text-primary);
+      border-color: var(--color-border);
+    }
+
+    .filters button[aria-pressed="true"] {
+      border-color: var(--color-accent);
+      color:        var(--color-accent);
+    }
+
+    /* ===== Clear Completed Button ===== */
+    #clear-completed {
+      padding:    var(--spacing-xs) var(--spacing-sm);
+      font-size:  var(--font-size-sm);
+      color:      var(--color-danger);
+      border-radius: var(--radius-sm);
+      transition:
+        color            var(--transition-speed) ease,
+        background-color var(--transition-speed) ease;
+    }
+
+    #clear-completed:hover {
+      background-color: rgba(239, 68, 68, 0.08);
+    }
+
+    [data-theme="dark"] #clear-completed:hover {
+      background-color: rgba(248, 113, 113, 0.1);
+    }
+
+    /* ===== Focus Visible Styles ===== */
+    /* Remove default outline for mouse users, keep it for keyboard users */
+    :focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    :focus-visible {
+      outline:        2.5px solid var(--color-accent);
+      outline-offset: 3px;
+      border-radius:  var(--radius-sm);
+    }
+
+    /* Specialised focus ring for circular toggle */
+    #theme-toggle:focus-visible {
+      outline:        2.5px solid var(--color-accent);
+      outline-offset: 3px;
+      border-radius:  var(--radius-full);
+    }
+
+    /* ===== Responsive (mobile-first, breakpoint at 600px) ===== */
+    @media (max-width: 600px) {
+      .container {
+        padding: var(--spacing-md) var(--spacing-sm);
+        gap:     var(--spacing-sm);
+      }
+
+      header h1 {
+        font-size: var(--font-size-xl);
+      }
+
+      #todo-form {
+        flex-direction: column;
+      }
+
+      #add-btn {
+        width: 100%;
+        padding: var(--spacing-sm);
+      }
+
+      footer {
+        flex-direction: column;
+        align-items:    flex-start;
+        gap:            var(--spacing-sm);
+      }
+
+      #items-left {
+        width: 100%;
+      }
+    }
+
+    /* ===== Visually Hidden (screen-reader-only) utility ===== */
+    /* Hides element visually while keeping it accessible to assistive technology */
+    .visually-hidden {
+      position: absolute;
+      width:    1px;
+      height:   1px;
+      padding:  0;
+      margin:   -1px;
+      overflow: hidden;
+      clip:     rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border:   0;
+    }
+
+    /* ===== Print Styles ===== */
+    @media print {
+      #theme-toggle,
+      .input-area,
+      footer {
+        display: none !important;
+      }
+
+      body {
+        background: #fff;
+        color: #000;
+      }
+
+      .todo-section {
+        box-shadow: none;
+      }
+    }
+
+    /* ===== Transitions / Animation ===== */
+    /* Ensure all surface-level elements transition smoothly during theme switches */
+    .input-area,
+    .todo-section,
+    footer,
+    #todo-input,
+    #add-btn,
+    .filters button,
+    #clear-completed,
+    #theme-toggle {
+      transition-property: background-color, color, border-color, box-shadow;
+      transition-duration: var(--transition-speed);
+      transition-timing-function: ease;
+    }
+
+    /* Override for elements that also animate transform independently */
+    #theme-toggle,
+    #add-btn {
+      transition-property: background-color, color, border-color, box-shadow, transform;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ===== Header ===== -->
+    <header>
+      <h1>My Todos</h1>
+
+      <button
+        id="theme-toggle"
+        type="button"
+        aria-label="Toggle colour theme"
+        title="Toggle light / dark theme"
+      >
+        <!-- Sun icon (shown in dark mode) -->
+        <svg
+          class="icon-sun"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+
+        <!-- Moon icon (shown in light mode) -->
+        <svg
+          class="icon-moon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- ===== Main Content ===== -->
+    <main>
+
+      <!-- Input Area -->
+      <section class="input-area" aria-label="Add a new todo">
+        <form id="todo-form" novalidate>
+          <label for="todo-input" class="visually-hidden">New todo</label>
+          <input
+            id="todo-input"
+            type="text"
+            placeholder="What needs to be done?"
+            autocomplete="off"
+            maxlength="500"
+            aria-label="New todo description"
+          />
+          <button type="submit" id="add-btn">Add</button>
+        </form>
+      </section>
+
+      <!-- Todo List -->
+      <section class="todo-section" aria-label="Todo list">
+        <ul id="todo-list" aria-live="polite" aria-label="Your todos">
+          <li class="empty-state" aria-label="Empty todo list">
+            No todos yet — add one above!
+          </li>
+        </ul>
+      </section>
+
+    </main>
+
+    <!-- ===== Footer ===== -->
+    <footer>
+      <span id="items-left">0 items left</span>
+
+      <nav class="filters" aria-label="Filter todos">
+        <button
+          type="button"
+          data-filter="all"
+          aria-pressed="true"
+        >All</button>
+        <button
+          type="button"
+          data-filter="active"
+          aria-pressed="false"
+        >Active</button>
+        <button
+          type="button"
+          data-filter="completed"
+          aria-pressed="false"
+        >Completed</button>
+      </nav>
+
+      <button type="button" id="clear-completed">Clear completed</button>
+    </footer>
+
+  </div><!-- /.container -->
+
+  <!--
+    Theme toggle script.
+    Wires up the toggle button to flip between light/dark themes
+    and persist the user's preference to localStorage.
+    All todo CRUD logic is intentionally excluded from this step.
+  -->
+  <script>
+    (function () {
+      var STORAGE_KEY = 'theme';
+      var root        = document.documentElement;
+      var toggleBtn   = document.getElementById('theme-toggle');
+
+      /**
+       * Apply the given theme ('light' | 'dark') to the <html> element
+       * and save it to localStorage for persistence across sessions.
+       * @param {string} theme
+       */
+      function applyTheme(theme) {
+        root.setAttribute('data-theme', theme);
+        try {
+          localStorage.setItem(STORAGE_KEY, theme);
+        } catch (e) {
+          // localStorage may be unavailable in private browsing — silently ignore
+        }
+      }
+
+      /**
+       * Read the current theme from the data-theme attribute.
+       * @returns {'light'|'dark'}
+       */
+      function currentTheme() {
+        return root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      }
+
+      // Wire up the toggle button
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', function () {
+          var next = currentTheme() === 'light' ? 'dark' : 'light';
+          applyTheme(next);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
